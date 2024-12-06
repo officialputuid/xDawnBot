@@ -12,6 +12,12 @@ from urllib.parse import urlparse
 
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
+logger.remove()
+logger.add(
+    sink=lambda msg: print(msg, end=''),
+    format="{time:DD/MM/YY HH:mm:ss} | <level>{level:8}</level> | <level>{message}</level>"
+)
+
 CONFIG_FILE = "config.json"
 PROXY_FILE = "proxy.txt"
 
@@ -109,7 +115,7 @@ def total_points(headers):
                     reward_data.get("bonus_points", 0),
                     referral_data.get("commission", 0)])
     except requests.exceptions.RequestException:
-        logger.error(f"🔴 Error fetching points.")
+        logger.error(f"Error fetching points.")
         return 0
 
 def keep_alive(headers, email, proxy=None, retries=3):
@@ -133,9 +139,9 @@ def keep_alive(headers, email, proxy=None, retries=3):
                 return False, json_response.get("message", "Keep alive failed.")
         except requests.exceptions.RequestException as e:
             attempt += 1
-            logger.error(f"🔴 Attempt {attempt}/{retries} failed. Error: {str(e).split('for url')[0]}")
+            logger.error(f"Attempt {attempt}/{retries} failed. Error: {str(e)[:30]}**")
             if attempt < retries:
-                logger.info(f"🔵 Retrying...")
+                logger.info(f"Retrying...")
                 time.sleep(3)  # Wait before retrying
             else:
                 return False, "Error during keep alive after 3 attempts."
@@ -145,15 +151,16 @@ async def telegram_message(message):
     try:
         await bot.send_message(chat_id=chat_id, text=message)
     except Exception as e:
-        logger.error(f"🔴 Error sending Telegram message: {e}")
+        logger.error(f"Error sending Telegram message: {e}")
 
 def countdown(seconds):
-    logger.info(f"🔵 Restarting in: {seconds} seconds")
+    logger.info(f"Restarting in: {seconds} seconds")
     time.sleep(seconds)
 
 async def main():
     # Ask the user if they want to use proxies
     use_proxies = get_user_input()
+    print(f"🔵 You selected: {'Yes' if use_proxies else 'No'}, ENJOY!\n")
 
     if use_proxies:
         proxies = read_proxies()
@@ -201,7 +208,7 @@ async def main():
 
             # If there is an error, try changing proxy
             if not success and proxies and proxy_idx is not None:
-                logger.warning(f"🔴 Proxy failed. Trying next proxy...")
+                logger.warning(f"Proxy failed. Trying next proxy...")
                 proxy_idx += 1
                 proxy = proxies[proxy_idx % len(proxies)]  # Rotate to next proxy
                 success, status_msg = keep_alive(headers, email, proxy)
@@ -209,12 +216,12 @@ async def main():
             # Formatting message for each account
             if success:
                 messages.append(f"👤 acc: {email}\n✍️ Info: success, Point: {points:,.0f} and Keep alive [OK]")
-                logger.success(f"🟢 Status: Keep alive recorded!")
+                logger.success(f"Status: Keep alive recorded!")
             else:
                 messages.append(f"👤 acc: {email}\n✍️ Info: error, Point: {points:,.0f} and Keep alive [FAILED]")
-                logger.error(f"🔴 Status: {status_msg}")
+                logger.error(f"Status: {status_msg}")
 
-            logger.info(f"🔵 Total Points: {points:,.0f}\n")
+            logger.info(f"Total Points: {points:,.0f}\n")
 
             # Rotate to the next proxy if used
             if proxy_idx is not None:
@@ -222,11 +229,11 @@ async def main():
 
         # Sending message to Telegram with total points from all users
         await telegram_message("\n".join(messages) + f"\n\nTotal points from all users: 💰 {total_points_all_users:,.0f}\n")
-        countdown(120)
-        logger.info(f"🔵 Restarting the process...\n")
+        countdown(180)
+        logger.info(f"Restarting the process...\n")
 
 if __name__ == '__main__':
     try:
         asyncio.run(main())
     except (KeyboardInterrupt, SystemExit):
-        logger.warning(f"🟡 Program terminated by user.")
+        logger.info(f"Program terminated by user. ENJOY!\n")
