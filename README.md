@@ -48,8 +48,8 @@ This bot connects to farm DAWN Validator using a multi account and support with/
 2. Go to [Plans](https://app.proxies.fo/plans) and only purchase the "ISP plan" (Residential plans don’t work).
 3. Top up your balance, or you can directly buy a plan and pay with Crypto!
 4. Go to the Dashboard, select your ISP plan, and click "Generate Proxy."
-5. Set the proxy format to `protocol://username:password@hostname:port` and choose any number for the proxy count.
-6. Paste the proxies into `proxy.txt`.
+5. Set the proxy format to `protocol://username:password@hostname:port`
+6. Choose any number for the proxy count, and paste the proxies into `proxy.txt`.
 
 ## Donations
 - **PayPal**: [Paypal.me/IPJAP](https://www.paypal.com/paypalme/IPJAP)
