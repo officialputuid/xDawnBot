@@ -51,7 +51,7 @@ bot = telegram.Bot(token=bot_token)
 keepalive_url = "https://www.aeropres.in/chromeapi/dawn/v1/userreward/keepalive"
 get_points_url = "https://www.aeropres.in/api/atom/v1/userreferral/getpoint"
 extension_id = "fpdkjdnhkakefebpekbdhillbhonfjjp"
-_v = "1.0.9"
+_v = "1.1.1"
 
 ua = UserAgent()
 
