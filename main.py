@@ -55,7 +55,7 @@ bot = telegram.Bot(token=bot_token)
 keepalive_url = "https://www.aeropres.in/chromeapi/dawn/v1/userreward/keepalive"
 get_points_url = "https://www.aeropres.in/api/atom/v1/userreferral/getpoint"
 extension_id = "fpdkjdnhkakefebpekbdhillbhonfjjp"
-_v = "1.1.1"
+_v = "1.1.2"
 
 ua = UserAgent()
 
@@ -134,7 +134,7 @@ def keep_alive(headers, email, proxy=None, retries=3):
     while attempt < retries:
         try:
             proxies = {"http": proxy, "https": proxy} if proxy else None
-            response = requests.post(f"{keepalive_url}?appid={appid}", headers=headers, json=payload, verify=False, proxies=proxies)
+            response = requests.post(f"{keepalive_url}?appid={appid}", headers=headers, json=payload, verify=False, proxies=proxies, timeout=30)
             response.raise_for_status()
             json_response = response.json()
             if json_response.get("success", False):
@@ -173,7 +173,6 @@ async def main():
         proxies = []
         proxy_idx = None  # No proxies used
 
-    
     while True:
         accounts = read_accounts()
         if not accounts:
@@ -233,7 +232,7 @@ async def main():
 
         # Sending message to Telegram with total points from all users
         await telegram_message("\n".join(messages) + f"\n\nTotal points from all users: 💰 {total_points_all_users:,.0f}\n")
-        countdown(180)
+        countdown(100)
         logger.info(f"Restarting the process...\n")
 
 if __name__ == '__main__':
